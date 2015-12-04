@@ -5,31 +5,36 @@
 
 #define MAX 300
 
-void menordistancia(FILE *f, int dim, int adj[][dim]){
+void menordistancia(FILE *f, int dim, float adj[][dim]){
 	char ch[MAX] = "INICIO";
+	FILE *ff = fopen("teste", "w+");
 	int x, j, i;
 	int ciclo[dim], menor[dim];
-	int dist, menordist = -1;
+	float dist, menordist = -1.0;
+	int conta = 0;
 	do{
 		dist = 0;
 		fgets(ch, MAX, f);
 		for(x=0;x<dim;x++){
 			fscanf(f, "%d", &ciclo[x]);
 			printf("%d", ciclo[x]);
+			fprintf(ff, "%d ", ciclo[x]);
+			conta++;
 		}
 		printf("\n", ciclo[x]);
 		for(x=0;x<dim;x++){
 			if(x<dim-1){
-				printf("%d + %d\n", dist, adj[(ciclo[x]-1)][(ciclo[x+1]-1)]);
+				printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[x+1]-1)]);
 				dist = dist + adj[(ciclo[x]-1)][(ciclo[x+1]-1)];
 			}
 			else{
-				printf("%d + %d\n", dist, adj[(ciclo[x]-1)][(ciclo[0]-1)]);
+				printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[0]-1)]);
 				printf("x %d y %d \n", ciclo[x]-1, ciclo[0]-1);
 				dist = dist + adj[(ciclo[x]-1)][(ciclo[0]-1)];
 			}
 		}
-		if(menordist == -1){
+		fprintf(ff, "%f\n", dist);
+		if(menordist == -1.0){
 			menordist = dist;
 			for(x=0;x<dim;x++){
 				menor[x] = ciclo[x];
@@ -43,20 +48,13 @@ void menordistancia(FILE *f, int dim, int adj[][dim]){
 		}
 	}while(strcmp(ch, "EOF"));
 
-	printf("menor distancia = %d\n", menordist);
+	printf("%d menor distancia = %f\n", conta, menordist);
 
 	for(x=0;x<dim;x++){
 		printf("%d ", menor[x]);
 	}
-	printf("\n");
-	for(i=0;i<dim;i++){
-		for(j=0;j<dim;j++){
-   			printf("%d ", adj[i][j]);
-   		}
-   		printf("\n");
-   	}
+	
    	printf("\n");
-	printf("\n");
 }
  
 void swap(int *x, int *y)
@@ -89,8 +87,8 @@ void permute(int *a, int l, int r, FILE *f)
    }
 }
 
-int distancia2d(int xi, int yi, int xj, int yj){
-	int distemp, distancia;
+float distancia2d(int xi, int yi, int xj, int yj){
+	float distemp, distancia;
 	distemp = ((xi-xj)*(xi-xj)) + ((yi - yj)*(yi - yj));
 	distancia = sqrt(distemp);
 	return distancia;
@@ -122,7 +120,7 @@ int main(){
 			if(ch[22] == '2'){ // Verifica se existe EUC_2D
 				fgets(ch, MAX, f); // Pula linha
 				int vtc[dim][3];
-				int adj[dim][dim];
+				float adj[dim][dim];
 				int mp[dim];
 				for(j=0;j<dim;j++){
 					fscanf(f, "%d %d %d", &id, &x, &y);
@@ -143,7 +141,7 @@ int main(){
 				}
 				for(i=0;i<dim;i++){
 					for(j=0;j<dim;j++){
-						printf("%d ", adj[i][j]);
+						printf("%f ", adj[i][j]);
 					}
 					printf("\n");
 				}
