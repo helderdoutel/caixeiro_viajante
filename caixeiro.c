@@ -4,6 +4,60 @@
 #include <string.h>
 
 #define MAX 300
+
+void menordistancia(FILE *f, int dim, int adj[][dim]){
+	char ch[MAX] = "INICIO";
+	int x, j, i;
+	int ciclo[dim], menor[dim];
+	int dist, menordist = -1;
+	do{
+		dist = 0;
+		fgets(ch, MAX, f);
+		for(x=0;x<dim;x++){
+			fscanf(f, "%d", &ciclo[x]);
+			printf("%d", ciclo[x]);
+		}
+		printf("\n", ciclo[x]);
+		for(x=0;x<dim;x++){
+			if(x<dim-1){
+				printf("%d + %d\n", dist, adj[(ciclo[x]-1)][(ciclo[x+1]-1)]);
+				dist = dist + adj[(ciclo[x]-1)][(ciclo[x+1]-1)];
+			}
+			else{
+				printf("%d + %d\n", dist, adj[(ciclo[x]-1)][(ciclo[0]-1)]);
+				printf("x %d y %d \n", ciclo[x]-1, ciclo[0]-1);
+				dist = dist + adj[(ciclo[x]-1)][(ciclo[0]-1)];
+			}
+		}
+		if(menordist == -1){
+			menordist = dist;
+			for(x=0;x<dim;x++){
+				menor[x] = ciclo[x];
+			}
+		}
+		if(menordist > dist){
+			menordist = dist;
+			for(x=0;x<dim;x++){
+				menor[x] = ciclo[x];
+			}
+		}
+	}while(strcmp(ch, "EOF"));
+
+	printf("menor distancia = %d\n", menordist);
+
+	for(x=0;x<dim;x++){
+		printf("%d ", menor[x]);
+	}
+	printf("\n");
+	for(i=0;i<dim;i++){
+		for(j=0;j<dim;j++){
+   			printf("%d ", adj[i][j]);
+   		}
+   		printf("\n");
+   	}
+   	printf("\n");
+	printf("\n");
+}
  
 void swap(int *x, int *y)
 {
@@ -94,9 +148,10 @@ int main(){
 					printf("\n");
 				}
 				permute(mp, 0, dim-1, cp);
-				// char str[] = "123456789";
-			 //    int n = strlen(str);
-			 //    permute(str, 0, n-1);
+				fprintf(cp, "EOF");
+				fclose(cp);
+				FILE *dists = fopen("cache", "r");
+				menordistancia(dists, dim, adj);
 			}
 
 			if(ch[22] == '3'){ // Verifica se existe EUC_3D
@@ -120,6 +175,7 @@ int main(){
 
 			if(strcmp(ch, "EOF")){ // Verifica se existe EXPLICIT
 				printf("acabou\n");
+				fclose(f);
 				break;
 			}
 		}
@@ -128,8 +184,6 @@ int main(){
 			printf("%s", ch);
 		}
 	}
-	fclose(f);
-	fclose(cp);
 
 	return 0;
 }	
