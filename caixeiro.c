@@ -5,43 +5,34 @@
 
 #define MAX 300
  
-/* Function to swap values at two pointers */
-void swap(char *x, char *y)
+void swap(int *x, int *y)
 {
-    char temp;
+    int temp;
     temp = *x;
     *x = *y;
     *y = temp;
 }
  
-/* Function to print permutations of string
-   This function takes three parameters:
-   1. String
-   2. Starting index of the string
-   3. Ending index of the string. */
-void permute(char *a, int l, int r)
+void permute(int *a, int l, int r, FILE *f)
 {
-   int i;
-   if (l == r)
-     printf("%s\n", a);
+   int i, x=0;
+   if (l == r){
+   		for(x=0;x<=r;x++){
+   			printf("%d ", a[x]);
+   			fprintf(f, "%d ", a[x]);
+   		}
+   		printf("\n");
+   		fprintf(f, "\n");
+   }	
    else
    {
        for (i = l; i <= r; i++)
        {
           swap((a+l), (a+i));
-          permute(a, l+1, r);
-          swap((a+l), (a+i)); //backtrack
+          permute(a, l+1, r, f);
+          swap((a+l), (a+i));
        }
    }
-}
- 
-/* Driver program to test above functions */
-int main()
-{
-    char str[] = "123456789";
-    int n = strlen(str);
-    permute(str, 0, n-1);
-    return 0;
 }
 
 int distancia2d(int xi, int yi, int xj, int yj){
@@ -59,10 +50,11 @@ int distancia3d(int xi, int yi, int xj, int yj, int zi, int zj){
 }
 
 int main(){
-	int i = 0, dim, j, x, y, z, tmp;
+	int i = 0, dim, j, x, y, z, id;
 	char ch[MAX], aux[10];
 
 	FILE *f = fopen("test.tsp", "r");
+	FILE *cp = fopen("cache", "w+");
 
 	for(i=0;strcmp(ch, "EOF") != 0;i++){	
 		if(i == 3){
@@ -76,16 +68,28 @@ int main(){
 			if(ch[22] == '2'){ // Verifica se existe EUC_2D
 				fgets(ch, MAX, f); // Pula linha
 				int vtc[dim][3];
+				int adj[dim][dim];
 				for(j=0;j<dim;j++){
-					fscanf(f, "%d %d %d", &tmp, &x, &y);
-					vtc[j][0] = tmp;
+					fscanf(f, "%d %d %d", &id, &x, &y);
+					vtc[j][0] = id;
 					vtc[j][1] = x;
 					vtc[j][2] = y;
+				}
+				for(i=0;i<dim;i++){
+					for(j=0;j<dim;j++){
+						adj[i][j] = distancia2d(vtc[i][1], vtc[i][2], vtc[j][1], vtc[j][2]);
+					}
 				}
 				for(j=0;j<dim;j++){
 					printf("id=%d\n", vtc[j][0]);
 					printf("x=%d ", vtc[j][1]);
 					printf("y=%d\n", vtc[j][2]);
+				}
+				for(i=0;i<dim;i++){
+					for(j=0;j<dim;j++){
+						printf("%d ", adj[i][j]);
+					}
+					printf("\n");
 				}
 				// char str[] = "123456789";
 			 //    int n = strlen(str);
@@ -96,8 +100,8 @@ int main(){
 				fgets(ch, MAX, f); // Pula linha
 				int vtc[dim][4];
 				for(j=0;j<dim;j++){
-					fscanf(f, "%d %d %d %d", &tmp, &x, &y, &z);
-					vtc[j][0] = tmp;
+					fscanf(f, "%d %d %d %d", &id, &x, &y, &z);
+					vtc[j][0] = id;
 					vtc[j][1] = x;
 					vtc[j][2] = y;
 					vtc[j][3] = z;
