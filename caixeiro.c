@@ -69,8 +69,10 @@ int main(){
 				fgets(ch, MAX, f); // Pula linha
 				int vtc[dim][3];
 				int adj[dim][dim];
+				int mp[dim];
 				for(j=0;j<dim;j++){
 					fscanf(f, "%d %d %d", &id, &x, &y);
+					mp[j] = id;
 					vtc[j][0] = id;
 					vtc[j][1] = x;
 					vtc[j][2] = y;
@@ -91,6 +93,7 @@ int main(){
 					}
 					printf("\n");
 				}
+				permute(mp, 0, dim-1, cp);
 				// char str[] = "123456789";
 			 //    int n = strlen(str);
 			 //    permute(str, 0, n-1);
@@ -125,6 +128,8 @@ int main(){
 			printf("%s", ch);
 		}
 	}
+	fclose(f);
+	fclose(cp);
 
 	return 0;
 }	
