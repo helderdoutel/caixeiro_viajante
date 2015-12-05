@@ -17,12 +17,12 @@ void escrevearquivo(FILE *f, char *nome, int dim, float tempo, int *vtc){
 	for(;x<dim;x++){
 		fprintf(f, "%d\n", vtc[x]);
 	}
-	fprintf(f, "EOF\n");
+	fprintf(f, "EOF");
 }
 
 float menordistancia(FILE *f, int dim, float adj[][dim], int *menor){
 	char ch[MAX] = "INICIO";
-	FILE *ff = fopen("teste", "w+");
+	// FILE *ff = fopen("teste", "w+");
 	int x, j, i;
 	int ciclo[dim];
 	float dist, menordist = -1.0;
@@ -32,23 +32,23 @@ float menordistancia(FILE *f, int dim, float adj[][dim], int *menor){
 		fgets(ch, MAX, f);
 		for(x=0;x<dim;x++){
 			fscanf(f, "%d", &ciclo[x]);
-			printf("%d", ciclo[x]);
-			fprintf(ff, "%d ", ciclo[x]);
+			// printf("%d", ciclo[x]);
+			// fprintf(ff, "%d ", ciclo[x]);
 			conta++;
 		}
-		printf("\n", ciclo[x]);
+		// printf("\n", ciclo[x]);
 		for(x=0;x<dim;x++){
 			if(x<dim-1){
-				printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[x+1]-1)]);
+				// printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[x+1]-1)]);
 				dist = dist + adj[(ciclo[x]-1)][(ciclo[x+1]-1)];
 			}
 			else{
-				printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[0]-1)]);
-				printf("x %d y %d \n", ciclo[x]-1, ciclo[0]-1);
+				// printf("%f + %f\n", dist, adj[(ciclo[x]-1)][(ciclo[0]-1)]);
+				// printf("x %d y %d \n", ciclo[x]-1, ciclo[0]-1);
 				dist = dist + adj[(ciclo[x]-1)][(ciclo[0]-1)];
 			}
 		}
-		fprintf(ff, "%f\n", dist);
+		// fprintf(ff, "%f\n", dist);
 		if(menordist == -1.0){
 			menordist = dist;
 			for(x=0;x<dim;x++){
@@ -70,6 +70,7 @@ float menordistancia(FILE *f, int dim, float adj[][dim], int *menor){
 	}
 	
    	printf("\n");
+   	// printf("%d\n", conta);
    	return dist;
 }
  
@@ -81,26 +82,32 @@ void swap(int *x, int *y)
     *y = temp;
 }
  
-void permute(int *a, int l, int r, FILE *f)
+void permute(clock_t c1, int *a, int l, int r, FILE *f, int t)
 {
-   int i, x=0;
-   if (l == r){
+	clock_t c2;
+	float tempo;
+	c2 = clock();
+	tempo = (c2 - c1)*10/ CLOCKS_PER_SEC; //s
+    int i, x=0;
+    if (l == r || tempo > t){
    		for(x=0;x<=r;x++){
-   			printf("%d ", a[x]);
+   			// printf("%d ", a[x]);
    			fprintf(f, "%d ", a[x]);
    		}
-   		printf("\n");
-   		fprintf(f, "\n");
-   }	
-   else
-   {
-       for (i = l; i <= r; i++)
-       {
-          swap((a+l), (a+i));
-          permute(a, l+1, r, f);
-          swap((a+l), (a+i));
-       }
-   }
+   		if(tempo > t){
+	   		printf("tempo limite determinado estourado\n");
+	   	}
+	   	fprintf(f, "\n");
+    }	
+    else
+    {
+       	for (i = l; i <= r; i++)
+       	{
+          	swap((a+l), (a+i));
+          	permute(c1, a, l+1, r, f, t);
+        	swap((a+l), (a+i));
+        }
+    }
 }
 
 float distancia2d(int xi, int yi, int xj, int yj){
@@ -121,14 +128,21 @@ int main(int argc, char* argv[]){
 	int i = 0, dim, j, k, x, y, z, id;
 	char ch[MAX], aux[10], nome[MAX];
 	clock_t c1, c2;
-	double tempo;
+	float tempo;
 	float md;
+	int tempo_finaliza;
 
 	FILE *f = fopen(argv[2], "r");
 	FILE *cp = fopen("cache", "w+");
 	FILE *n = fopen(argv[3], "w+");
 
 	c1 = clock();
+	tempo_finaliza = atoi(argv[1]);
+
+	if(!argv[3]){
+		printf("insira o nome do arquivo de saida\nexemplo: ./caixeiro 100 exemplo.tsp saida.tour.tsp");
+		return 0;
+	}
 
 	for(i=0;strcmp(ch, "EOF") != 0;i++){	
 		if(i == 3){
@@ -156,25 +170,25 @@ int main(int argc, char* argv[]){
 						adj[i][j] = distancia2d(vtc[i][1], vtc[i][2], vtc[j][1], vtc[j][2]);
 					}
 				}
-				for(j=0;j<dim;j++){
-					printf("id=%d\n", vtc[j][0]);
-					printf("x=%d ", vtc[j][1]);
-					printf("y=%d\n", vtc[j][2]);
-				}
-				for(i=0;i<dim;i++){
-					for(j=0;j<dim;j++){
-						printf("%f ", adj[i][j]);
-					}
-					printf("\n");
-				}
-				permute(mp, 0, dim-1, cp);
+				// for(j=0;j<dim;j++){
+				// 	printf("id=%d\n", vtc[j][0]);
+				// 	printf("x=%d ", vtc[j][1]);
+				// 	printf("y=%d\n", vtc[j][2]);
+				// }
+				// for(i=0;i<dim;i++){
+				// 	for(j=0;j<dim;j++){
+				// 		printf("%f ", adj[i][j]);
+				// 	}
+				// 	printf("\n");
+				// }
+				permute(c1, mp, 0, dim-1, cp, tempo_finaliza);
 				fprintf(cp, "EOF");
 				fclose(cp);
 				FILE *dists = fopen("cache", "r");
 				int menor[dim];
 				md = menordistancia(dists, dim, adj, menor);
 				c2 = clock();
-				tempo = (double)(c2 - c1)*10/ CLOCKS_PER_SEC; //ms
+				tempo = (c2 - c1)/ CLOCKS_PER_SEC; //ms
 				printf("tempo = %f\n", tempo);
 				escrevearquivo(n, nome, dim, tempo, menor);
 				fclose(n);	
@@ -198,26 +212,26 @@ int main(int argc, char* argv[]){
 						adj[i][j] = distancia3d(vtc[i][1], vtc[i][2], vtc[i][3], vtc[j][1], vtc[j][2], vtc[j][3]);
 					}
 				}
-				for(j=0;j<dim;j++){
-					printf("id=%d\n", vtc[j][0]);
-					printf("x=%d ", vtc[j][1]);
-					printf("y=%d\n", vtc[j][2]);
-					printf("z=%d\n", vtc[j][3]);
-				}
-				for(i=0;i<dim;i++){
-					for(j=0;j<dim;j++){
-						printf("%f ", adj[i][j]);
-					}
-					printf("\n");
-				}
-				permute(mp, 0, dim-1, cp);
+				// for(j=0;j<dim;j++){
+				// 	printf("id=%d\n", vtc[j][0]);
+				// 	printf("x=%d ", vtc[j][1]);
+				// 	printf("y=%d\n", vtc[j][2]);
+				// 	printf("z=%d\n", vtc[j][3]);
+				// }
+				// for(i=0;i<dim;i++){
+				// 	for(j=0;j<dim;j++){
+				// 		printf("%f ", adj[i][j]);
+				// 	}
+				// 	printf("\n");
+				// }
+				permute(c1, mp, 0, dim-1, cp, tempo_finaliza);
 				fprintf(cp, "EOF");
 				fclose(cp);
 				FILE *dists = fopen("cache", "r");
 				int menor[dim];
 				md = menordistancia(dists, dim, adj, menor);
 				c2 = clock();
-				tempo = (double)(c2 - c1)*10/ CLOCKS_PER_SEC; //ms
+				tempo = (c2 - c1)*10/ CLOCKS_PER_SEC; //ms
 				printf("tempo = %f\n", tempo);
 				escrevearquivo(n, nome, dim, tempo, menor);
 				fclose(n);	
@@ -225,7 +239,8 @@ int main(int argc, char* argv[]){
 			}
 
 			if(strcmp(ch, "EOF")){ // Verifica se existe EXPLICIT
-				printf("acabou\n", dim);
+				printf("acabou\n");
+				printf("Arquivo de solucao %s gravado no diretorio\n", argv[3]);
 				fclose(f);
 				break;
 			}
@@ -235,11 +250,11 @@ int main(int argc, char* argv[]){
 				fscanf(f, "%s", ch);
 				fscanf(f, "%s", nome);
 				fgets(ch, MAX, f); // Armazena cada linha em c1
-				printf("%s\n", nome);
+				// printf("%s\n", nome);
 			}
 			else{
 				fgets(ch, MAX, f); // Armazena cada linha em c1
-				printf("%s", ch);
+				// printf("%s", ch);
 			}
 		}
 	}

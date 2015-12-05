@@ -1,10 +1,17 @@
 NAME: exemplo5
 COMMENT: solucao obtida para exemplo5
 TYPE: TSP
-NAME: 3
-TOTAL_WEIGHT: 0.000000
+NAME: 10
+TOTAL_WEIGHT: 8.000000
 TOUR_SECTION
-1
-3
 2
+4
+7
+10
+1
+6
+3
+9
+8
+5
 EOF
