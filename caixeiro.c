@@ -7,13 +7,13 @@
 #define MAX 300
 
 // Escreve arquivo de saida
-void escrevearquivo(FILE *f, char *nome, int dim, float tempo, int *vtc){
+void escrevearquivo(FILE *f, char *nome, int dim, float md, int *vtc){
 	int x=0;
 	fprintf(f, "NAME: %s\n", nome);
 	fprintf(f, "COMMENT: solucao obtida para %s\n", nome);
 	fprintf(f, "TYPE: TSP\n");
 	fprintf(f, "NAME: %d\n", dim);
-	fprintf(f, "TOTAL_WEIGHT: %f\n", tempo);
+	fprintf(f, "TOTAL_WEIGHT: %f\n", md);
 	fprintf(f, "TOUR_SECTION\n");
 	for(;x<dim;x++){
 		fprintf(f, "%d\n", vtc[x]); // escreve vertices do ciclo mais curto
@@ -72,7 +72,7 @@ float menordistancia(FILE *f, int dim, float adj[][dim], int *menor){
 	}
 	
    	printf("\n");
-   	return dist;
+   	return menordist;
 }
 
 // inverte valores no vetor que esta sendo permutado
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]){
 				tempo = (c2 - c1)/ CLOCKS_PER_SEC; //s
 				printf("tempo = %f\n", tempo);
 				// escreve arquivo de saida, passa arquivo de saida, nome, dimensao, tempo final e vetor do menor ciclo
-				escrevearquivo(n, nome, dim, tempo, menor);
+				escrevearquivo(n, nome, dim, md, menor);
 				fclose(n);	
 			}
 			// mesmo procedimento com 3 coordenadas
